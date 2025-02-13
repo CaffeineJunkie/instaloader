@@ -2,11 +2,13 @@ import getpass
 import json
 import os
 import platform
+import random
 import re
 import shutil
 import string
 import sys
 import tempfile
+import time
 from contextlib import contextmanager, suppress
 from datetime import datetime, timezone
 from functools import wraps
@@ -751,6 +753,9 @@ class Instaloader:
                             # Download sidecar video if desired
                             downloaded &= self.download_pic(filename=sidecar_filename, url=sidecar_node.video_url,
                                                             mtime=post.date_local, filename_suffix=suffix)
+                            # Add random delay between 2-4 seconds
+                            delay = random.uniform(2, 4)
+                            time.sleep(delay)
                 else:
                     downloaded = False
         elif post.typename == 'GraphImage':
@@ -878,6 +883,9 @@ class Instaloader:
                     downloaded = self.download_storyitem(item, filename_target if filename_target else name)
                     if fast_update and not downloaded:
                         break
+                # Add random delay between 10-25 seconds
+                delay = random.uniform(10, 45)
+                time.sleep(delay)
             if latest_stamps is not None:
                 latest_stamps.set_last_story_timestamp(name, scraped_timestamp)
 
@@ -1042,6 +1050,7 @@ class Instaloader:
                 check_bbd=self.check_resume_bbd,
                 enabled=self.resume_prefix is not None
         ) as (is_resuming, start_index):
+            delaycount = 0
             for number, post in enumerate(posts, start=start_index + 1):
                 should_stop = not takewhile(post)
                 if should_stop and number <= possibly_pinned:
@@ -1082,6 +1091,15 @@ class Instaloader:
                         # disengage fast_update for first post when resuming
                         if not is_resuming or number > 0:
                             break
+                    
+                    delaycount = delaycount + 1
+                    if delaycount > random.uniform(250, 300):
+                        delaycount = 0
+                        delaylong = random.uniform(160, 190)
+                        time.sleep(delaylong)
+                    # Add random delay between 10-25 seconds
+                    delay = random.uniform(10, 45)
+                    time.sleep(delay)
 
     @_requires_login
     def get_feed_posts(self) -> Iterator[Post]:
