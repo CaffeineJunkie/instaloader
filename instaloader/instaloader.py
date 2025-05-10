@@ -357,6 +357,9 @@ class Instaloader:
             return False
         self.context.write_raw(resp, filename)
         os.utime(filename, (datetime.now().timestamp(), mtime.timestamp()))
+        # Add random delay between 2-4 seconds
+        delay_mini = random.uniform(2, 4)
+        time.sleep(delay_mini)
         return True
 
     def save_metadata_json(self, filename: str, structure: JsonExportable) -> None:
@@ -1092,10 +1095,13 @@ class Instaloader:
                         if not is_resuming or number > 0:
                             break
                     
+                    # Add 60 to 70 minute delay every 100 to 115 posts
                     delaycount = delaycount + 1
-                    if delaycount > random.uniform(250, 300):
+                    if delaycount > random.uniform(100, 115):
                         delaycount = 0
-                        delaylong = random.uniform(160, 190)
+                        delaylong = random.uniform(3600, 4200)
+                        delaymsg = "Sleeping for {} seconds.".format(delaylong)
+                        self.context.log(delaymsg)
                         time.sleep(delaylong)
                     # Add random delay between 10-25 seconds
                     delay = random.uniform(10, 45)
